@@ -1,0 +1,61 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> result = new ArrayList<>();
+        // Sorting helps us optimize by breaking early when candidates exceed the remaining target
+        Arrays.sort(candidates);
+        backtrack(result, new ArrayList<>(), candidates, target, 0);
+        return result;
+    }
+
+    private void backtrack(List<List<Integer>> result, List<Integer> tempList, int[] candidates, int remain, int start) {
+        // Base Case: if the remaining target is less than 0, this path is invalid
+        if (remain < 0) {
+            return;
+        }
+        
+        // Base Case: if we hit 0, we found a valid combination
+        if (remain == 0) {
+            result.add(new ArrayList<>(tempList));
+            return;
+        }
+
+        // Iterate through candidates starting from the current index
+        for (int i = start; i < candidates.length; i++) {
+            // Optimization: since the array is sorted, if the current candidate exceeds the remaining target, 
+            // all subsequent elements will also exceed it, so we can break early.
+            if (candidates[i] > remain) {
+                break;
+            }
+
+            // Choose: add the candidate to the current combination
+            tempList.add(candidates[i]);
+            
+            // Explore: recursively call backtrack. We pass 'i' (not 'i + 1') because 
+            // the same element can be chosen multiple times.
+            backtrack(result, tempList, candidates, remain - candidates[i], i);
+            
+            // Unchoose (Backtrack): remove the last element to try the next candidate
+            tempList.remove(tempList.size() - 1);
+        }
+    }
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+
+        // Test Example 1
+        int[] candidates1 = {2, 3, 6, 7};
+        int target1 = 7;
+        System.out.println("Candidates: " + Arrays.toString(candidates1) + ", Target: " + target1);
+        System.out.println("Combinations: " + solution.combinationSum(candidates1, target1));
+
+        // Test Example 2
+        int[] candidates2 = {2, 3, 5};
+        int target2 = 8;
+        System.out.println("\nCandidates: " + Arrays.toString(candidates2) + ", Target: " + target2);
+        System.out.println("Combinations: " + solution.combinationSum(candidates2, target2));
+    }
+}
